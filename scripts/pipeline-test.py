@@ -22,6 +22,7 @@ def main():
 
     print(f"[pipeline-test] target={args.target}")
     print(f"[pipeline-test] message={args.message}")
+    print("[pipeline-test] v2 — pipeline fired successfully")
 
 
 if __name__ == "__main__":
