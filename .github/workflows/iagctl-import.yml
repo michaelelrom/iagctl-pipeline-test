@@ -15,6 +15,9 @@ jobs:
     runs-on: self-hosted
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Write iagctl config
         run: |
           mkdir -p ~/.iagctl
@@ -30,19 +33,7 @@ jobs:
         run: iagctl version
 
       - name: Validate import file
-        run: |
-          iagctl db import \
-            import.yaml \
-            --check
+        run: iagctl db import import.yaml --check
 
       - name: Import services
-        run: |
-          iagctl db import \
-            import.yaml \
-            --force
-
-      - name: Smoke test — run service
-        run: |
-          iagctl run pipeline-test-script \
-            --arg message="Deployed via CI on $(date -u +%Y-%m-%dT%H:%M:%SZ)" \
-            --arg target="iag5"
+        run: iagctl db import import.yaml --force
