@@ -5,7 +5,7 @@ A GitHub Actions pipeline that automatically imports IAG5 services into [Itentia
 ## How it works
 
 ```
-Push change to tests/iagctl-pipeline-test/**
+Push change to import.yaml or scripts/**
         │
         ▼
 GitHub Actions (self-hosted runner on your Mac)
@@ -38,11 +38,21 @@ scripts/
 
 ### 1. Get an iagctl API key
 
+Login and capture the API key in one step:
+
+```bash
+iagctl login admin --raw 2>/dev/null | grep -i "api-key\|apiKey\|key" | awk '{print $NF}'
+```
+
+Or login interactively and copy the key manually:
+
 ```bash
 iagctl login admin --raw
 ```
 
-Copy the `api-key` value from the output — you'll need it as a secret.
+Enter your password when prompted. The output will contain your API key — copy the value and store it as the `IAG5_API_KEY` secret.
+
+> **Note:** The API key does not expire. It is only invalidated if you run `iagctl login admin --change-password`. If you rotate your password, regenerate the key and update the secret.
 
 ### 2. Register a self-hosted runner
 
