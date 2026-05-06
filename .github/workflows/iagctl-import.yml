@@ -5,7 +5,8 @@ on:
     branches:
       - main
     paths:
-      - "tests/iagctl-pipeline-test/**"
+      - "import.yaml"
+      - "scripts/**"
   workflow_dispatch:
 
 jobs:
@@ -31,13 +32,13 @@ jobs:
       - name: Validate import file
         run: |
           iagctl db import \
-            tests/iagctl-pipeline-test/import.yaml \
+            import.yaml \
             --check
 
       - name: Import services
         run: |
           iagctl db import \
-            tests/iagctl-pipeline-test/import.yaml \
+            import.yaml \
             --force
 
       - name: Smoke test — run service

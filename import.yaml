@@ -13,7 +13,7 @@ services:
     type: python-script
     description: Pipeline test — prints a configurable message via decorator variables
     filename: pipeline-test.py
-    working-directory: tests/iagctl-pipeline-test/scripts
+    working-directory: scripts
     repository: iagctl-pipeline-test
     decorator: pipeline-test-decorator
     tags:

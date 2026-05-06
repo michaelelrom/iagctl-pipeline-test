@@ -23,10 +23,9 @@ Service appears in Gateway Manager
 ```
 .github/workflows/
   iagctl-import.yml                 ← pipeline definition
-tests/iagctl-pipeline-test/
-  import.yaml                       ← service + decorator definition
-  scripts/
-    pipeline-test.py                ← IAG5 Python service
+import.yaml                         ← service + decorator definition
+scripts/
+  pipeline-test.py                  ← IAG5 Python service
 ```
 
 ## Prerequisites
@@ -71,14 +70,14 @@ Edit either the script or the decorator and push to `main`:
 
 ```bash
 # edit the service script
-vi tests/iagctl-pipeline-test/scripts/pipeline-test.py
+vi scripts/pipeline-test.py
 
-git add tests/iagctl-pipeline-test/
+git add import.yaml scripts/
 git commit -m "chore: trigger pipeline test"
 git push origin main
 ```
 
-The pipeline triggers automatically on any change under `tests/iagctl-pipeline-test/`.
+The pipeline triggers automatically on any change to `import.yaml` or `scripts/`.
 
 ### Verify in Gateway Manager
 
@@ -94,7 +93,7 @@ Run the service from the UI and pass `message` and `target` as inputs.
 
 | What to change | File |
 |---|---|
-| Script logic | `tests/iagctl-pipeline-test/scripts/pipeline-test.py` |
-| Input variables / schema | `decorators` section of `tests/iagctl-pipeline-test/import.yaml` |
-| Service metadata (name, tags) | `services` section of `tests/iagctl-pipeline-test/import.yaml` |
+| Script logic | `scripts/pipeline-test.py` |
+| Input variables / schema | `decorators` section of `import.yaml` |
+| Service metadata (name, tags) | `services` section of `import.yaml` |
 | Pipeline triggers / steps | `.github/workflows/iagctl-import.yml` |
