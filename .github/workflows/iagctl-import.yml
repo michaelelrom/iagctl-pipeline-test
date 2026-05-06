@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - "scripts/import.yaml"
+      - "import.yaml"
       - "scripts/**"
   workflow_dispatch:
 
@@ -33,7 +33,7 @@ jobs:
         run: iagctl version
 
       - name: Validate import file
-        run: iagctl db import scripts/import.yaml --check
+        run: iagctl db import import.yaml --check
 
       - name: Import services
-        run: iagctl db import scripts/import.yaml --force
+        run: iagctl db import import.yaml --force
