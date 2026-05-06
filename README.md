@@ -1,0 +1,100 @@
+# iagctl-pipeline-test
+
+A GitHub Actions pipeline that automatically imports IAG5 services into [Itential Automation Gateway](https://itential.com) via `iagctl db import` whenever the script or decorator changes.
+
+## How it works
+
+```
+Push change to tests/iagctl-pipeline-test/**
+        │
+        ▼
+GitHub Actions (self-hosted runner on your Mac)
+        │
+        ├── iagctl db import --check   (validate)
+        ├── iagctl db import --force   (import into IAG5)
+        └── iagctl run pipeline-test-script  (smoke test)
+        │
+        ▼
+Service appears in Gateway Manager
+```
+
+## Repo structure
+
+```
+.github/workflows/
+  iagctl-import.yml                 ← pipeline definition
+tests/iagctl-pipeline-test/
+  import.yaml                       ← service + decorator definition
+  scripts/
+    pipeline-test.py                ← IAG5 Python service
+```
+
+## Prerequisites
+
+- IAG5 (gateway5) running locally via `itential-dev-stack`
+- `iagctl` installed on your Mac at `/usr/local/bin/iagctl`
+- A GitHub Actions self-hosted runner registered on this repo
+
+## One-time setup
+
+### 1. Get an iagctl API key
+
+```bash
+iagctl login admin --raw
+```
+
+Copy the `api-key` value from the output — you'll need it as a secret.
+
+### 2. Register a self-hosted runner
+
+Go to **Settings → Actions → Runners → New self-hosted runner** in this repo and follow the macOS instructions. The runner must be running on the same machine as your `itential-dev-stack` so it can reach `gateway5` on `localhost:50051`.
+
+### 3. Add GitHub secrets
+
+Go to **Settings → Secrets and variables → Actions** and add:
+
+| Secret | Value |
+|---|---|
+| `IAG5_SERVER` | `localhost:50051` |
+| `IAG5_API_KEY` | API key from step 1 |
+| `IAG5_CA_CERT` | Contents of `volumes/gateway5/certificates/gw-manager.pem` |
+
+## Testing
+
+### Option A — trigger manually (no code change needed)
+
+Go to **Actions → iagctl-import → Run workflow** in the GitHub UI.
+
+### Option B — push a change
+
+Edit either the script or the decorator and push to `main`:
+
+```bash
+# edit the service script
+vi tests/iagctl-pipeline-test/scripts/pipeline-test.py
+
+git add tests/iagctl-pipeline-test/
+git commit -m "chore: trigger pipeline test"
+git push origin main
+```
+
+The pipeline triggers automatically on any change under `tests/iagctl-pipeline-test/`.
+
+### Verify in Gateway Manager
+
+After the pipeline succeeds, open **Gateway Manager** in your Itential Platform and look for:
+
+- **Repository:** `iagctl-pipeline-test`
+- **Service:** `pipeline-test-script`
+- **Decorator:** `pipeline-test-decorator`
+
+Run the service from the UI and pass `message` and `target` as inputs.
+
+## Modifying the service
+
+| What to change | File |
+|---|---|
+| Script logic | `tests/iagctl-pipeline-test/scripts/pipeline-test.py` |
+| Input variables / schema | `decorators` section of `tests/iagctl-pipeline-test/import.yaml` |
+| Service metadata (name, tags) | `services` section of `tests/iagctl-pipeline-test/import.yaml` |
+| Pipeline triggers / steps | `.github/workflows/iagctl-import.yml` |
