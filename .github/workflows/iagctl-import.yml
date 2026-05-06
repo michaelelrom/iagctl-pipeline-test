@@ -1,0 +1,47 @@
+name: iagctl-import
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "tests/iagctl-pipeline-test/**"
+  workflow_dispatch:
+
+jobs:
+  import:
+    name: Import services into IAG5 via Gateway Manager
+    runs-on: self-hosted
+
+    steps:
+      - name: Write iagctl config
+        run: |
+          mkdir -p ~/.iagctl
+          cat > ~/.iagctl/config.yaml <<EOF
+          server: ${{ secrets.IAG5_SERVER }}
+          api-key: ${{ secrets.IAG5_API_KEY }}
+          tls:
+            ca: ${{ secrets.IAG5_CA_CERT }}
+            insecure: false
+          EOF
+
+      - name: Verify iagctl connectivity
+        run: iagctl version
+
+      - name: Validate import file
+        run: |
+          iagctl db import \
+            tests/iagctl-pipeline-test/import.yaml \
+            --check
+
+      - name: Import services
+        run: |
+          iagctl db import \
+            tests/iagctl-pipeline-test/import.yaml \
+            --force
+
+      - name: Smoke test — run service
+        run: |
+          iagctl run pipeline-test-script \
+            --arg message="Deployed via CI on $(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            --arg target="iag5"

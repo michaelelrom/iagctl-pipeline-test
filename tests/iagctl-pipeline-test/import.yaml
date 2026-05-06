@@ -1,0 +1,39 @@
+---
+repositories:
+  - name: iagctl-pipeline-test
+    description: Pipeline test services for itential-dev-stack
+    url: https://github.com/michaelelrom/iagctl-pipeline-test.git
+    reference: main
+    tags:
+      - test
+      - pipeline
+
+services:
+  - name: pipeline-test-script
+    type: python-script
+    description: Pipeline test — prints a configurable message via decorator variables
+    filename: pipeline-test.py
+    working-directory: tests/iagctl-pipeline-test/scripts
+    repository: iagctl-pipeline-test
+    decorator: pipeline-test-decorator
+    tags:
+      - test
+      - pipeline
+
+decorators:
+  - name: pipeline-test-decorator
+    schema:
+      $id: pipeline-test-decorator
+      $schema: https://json-schema.org/draft/2020-12/schema
+      type: object
+      additionalProperties: false
+      properties:
+        message:
+          type: string
+          description: Message to print from the pipeline test
+          default: "Hello from IAG pipeline test!"
+        target:
+          type: string
+          description: Target label for the test run
+          default: "iag5"
+      required: []
